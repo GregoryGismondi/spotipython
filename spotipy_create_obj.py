@@ -34,8 +34,8 @@ def create_song_info(song_name: str, artist_name: str) -> main_classes.SongInfo:
             print("No corresponding song and artist on spotify.")
 
 @check_contracts
-def create_user_preference() -> main_classes.User:
-    """Prompts the user to answer some questions and creates a UserPreference object
+def create_user() -> main_classes.User:
+    """Prompts the user to answer some questions and creates a User object
     for the given user input
 
     Asks for the user's favorite song, its corresponding artist, and the user's desired
