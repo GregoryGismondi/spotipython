@@ -27,11 +27,11 @@ def artist_5_related(artist_name: str) -> dict | None:
     """Get the top 5 most related artists to the input artist. Return a dictionary where the key is the artist's 
     name and the value is the artist's id.
     """
-    id = artist_id(artist_name)
-    if id is None:
+    ids = artist_id(artist_name)
+    if ids is None:
         return 
 
-    related_artist = sp.artist_related_artists(id)
+    related_artist = sp.artist_related_artists(ids)
 
     related_users = {}
     for external_urls in related_artist['artists']:
