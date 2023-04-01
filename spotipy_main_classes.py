@@ -1,5 +1,8 @@
 """ Contains the SongInfo, ArtistNode, and ArtistTree Class"""
 from typing import Optional
+from __future__ import annotations
+# Comment out this line when you aren't using check_contracts
+from python_ta.contracts import check_contracts
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
@@ -70,7 +73,7 @@ class ArtistNode:
     artist_name: str
     artist_id: str
     top_tracks: list[SongInfo]
-    
+
     def __init__(self, artist_name, artist_id) -> None:
         """Initialize a new ArtistNode.
         """
@@ -107,3 +110,28 @@ class ArtistTree:
         self.artist = artist
         self.depth = depth
         self._subtrees = _subtrees
+
+    def get_subtrees(self) -> list[ArtistTree]:
+        """Return the subtrees of this artist tree."""
+        return list(tree for tree in self._subtrees)
+
+    def insert_subtrees(self, artists: list[ArtistNode], parent_node: ArtistNode) -> None:
+        """Inserts the subtree(s) as subtrees of the parent node.
+        Note: artists are the related artists to the parent node"""
+        self._subtrees = artists
+
+
+if __name__ == '__main__':
+    import doctest
+
+    doctest.testmod(verbose=True)
+
+    # When you are ready to check your work with python_ta, uncomment the following lines.
+    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
+    # You can use "Run file in Python Console" to run PythonTA,
+    # and then also test your methods manually in the console.
+    # import python_ta
+    #
+    # python_ta.check_all(config={
+    #     'max-line-length': 120
+    # })
