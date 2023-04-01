@@ -1,8 +1,12 @@
 import spotipy
-from spotipy.oauth2 import SpotifyOAuth
+from spotipy.oauth2 import SpotifyClientCredentials
 
-scope = "user-library-read"
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(scope=scope))
+app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
+app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
+
+
+client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, client_secret=app_client_secret)
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 def get_artist_uri(artist_name: str) -> str | None:
