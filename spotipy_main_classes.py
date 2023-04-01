@@ -7,6 +7,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="5202dc0ad2804ed3ad2de97ec126dd3e",
                                                            client_secret="0c27609af46b4e83b5804a3564b943da"))
 
+
 class SongInfo:
     """
     Information about a song.
@@ -25,7 +26,7 @@ class SongInfo:
       - valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
         Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric),
         while tracks with low valence sound more negative (e.g. sad, depressed, angry).
-      - tempo: The average tempo of a track in beats per minute (BPM). Unlike the others, this # goes past 1.0
+      - tempo: The average tempo of a track in beats per minute (BPM). Unlike the others, this number goes past 1.0
       - instrumentalness: Predicts whether a track contains no vocals.
         The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content.
       - energy: a measure from 0.0 to 1.0 represending a measure of intensity and activity.
@@ -43,8 +44,7 @@ class SongInfo:
     acoustic: float
 
     def __init__(self, song_name: str, artist_name: str, danceability: float,
-    valence: float, tempo: float, instrumentalness: float, energy: float, acoustic: float) -> None:
-
+                 valence: float, tempo: float, instrumentalness: float, energy: float, acoustic: float) -> None:
         """Initialize a new SongNode.
         """
         self.song_name = song_name
@@ -55,6 +55,7 @@ class SongInfo:
         self.instrumentalness = instrumentalness
         self.energy = energy
         self.acoustic = acoustic
+
 
 class ArtistNode:
     """
@@ -69,8 +70,8 @@ class ArtistNode:
     artist_name: str
     artist_id: str
     top_tracks: list[SongInfo]
+    
     def __init__(self, artist_name, artist_id) -> None:
-
         """Initialize a new ArtistNode.
         """
         self.artist_name = artist_name
