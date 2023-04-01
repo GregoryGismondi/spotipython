@@ -1,15 +1,18 @@
 """ Contains the SongInfo, ArtistNode, and ArtistTree Class"""
-from typing import Optional
 from __future__ import annotations
+from typing import Optional
+
 # Comment out this line when you aren't using check_contracts
 from python_ta.contracts import check_contracts
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
-sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="5202dc0ad2804ed3ad2de97ec126dd3e",
-                                                           client_secret="0c27609af46b4e83b5804a3564b943da"))
+app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
+app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
 
+client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, client_secret=app_client_secret)
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 class SongInfo:
     """
@@ -34,7 +37,7 @@ class SongInfo:
         The closer the instrumentalness value is to 1.0, the greater likelihood the track contains no vocal content.
       - energy: a measure from 0.0 to 1.0 represending a measure of intensity and activity.
         Typically, energetic tracks feel fast, loud, and noisy. A higher number represents higher energy.
-      - acoustic: A measure from 0.0 to 1.0 of whether the track is acoustic.
+      - acousticness: A measure from 0.0 to 1.0 of whether the track is acoustic.
         1.0 represents high confidence the track is acoustic.
     """
     song_name: str
@@ -44,10 +47,10 @@ class SongInfo:
     tempo: float
     instrumentalness: float
     energy: float
-    acoustic: float
+    acousticness: float
 
     def __init__(self, song_name: str, artist_name: str, danceability: float,
-                 valence: float, tempo: float, instrumentalness: float, energy: float, acoustic: float) -> None:
+                 valence: float, tempo: float, instrumentalness: float, energy: float, acousticness: float) -> None:
         """Initialize a new SongNode.
         """
         self.song_name = song_name
@@ -57,7 +60,7 @@ class SongInfo:
         self.tempo = tempo
         self.instrumentalness = instrumentalness
         self.energy = energy
-        self.acoustic = acoustic
+        self.acousticness = acousticness
 
 
 class ArtistNode:
