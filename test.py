@@ -31,7 +31,7 @@ def artist_5_related(artist_name: str) -> dict | None:
     if id is None:
         return 
 
-    related_artist = sp.artist_related_artists(uri)
+    related_artist = sp.artist_related_artists(id)
 
     related_users = {}
     for external_urls in related_artist['artists']:
