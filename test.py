@@ -9,7 +9,7 @@ client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, c
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
-def get_artist_uri(artist_name: str) -> str | None:
+def get_artist_id(artist_name: str) -> str | None:
     """Get artist uri
 
     Preconditions: Must write the artist name how it is on their spotify profile
@@ -23,19 +23,19 @@ def get_artist_uri(artist_name: str) -> str | None:
         return
 
 
-def artist_5_related(artist_name: str) -> list | None:
-    """Get the top 5 most related artists to the artist they're related to."""
+def artist_5_related(artist_name: str) -> dict | None:
+    """Get the top 5 most related artists to the input artist. Return a dictionary where the key is the artist's name and the value is the artist's id."""
     uri = get_artist_uri(artist_name)
     if uri is None:
         return None
 
     related_artist = sp.artist_related_artists(uri)
 
-    related_users = []
+    related_users = {}
     for external_urls in related_artist['artists']:
         if len(related_users) == 5:
             return related_users
         else:
-            related_users.append(external_urls['name'])
+            related_users[external_urls['name']] = external_urls['id']
 
     return related_users
