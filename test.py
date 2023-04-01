@@ -9,10 +9,10 @@ client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, c
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
-def get_artist_id(artist_name: str) -> str | None:
-    """Get artist uri
-
-    Preconditions: Must write the artist name how it is on their spotify profile
+def artist_id(artist_name: str) -> str | None:
+    """Get the given artit's id. 
+    
+    Preconditions: The artist_name must be written the way it is on their spotify profile.
     """
     results = sp.search(q=artist_name, type='artist', limit=1)
     if artist_name == results["artists"]["items"][0]["name"]:
