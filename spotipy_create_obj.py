@@ -40,6 +40,9 @@ def create_user() -> main_classes.User:
 
     Asks for the user's favorite song, its corresponding artist, and the user's desired
     diversity level.
+    
+    Preconditions:
+    - The user's input for song_name and corresponding artist_name are valid names in Spotify.
 
     Representation Invariants:
     - div_level == '' or div_level.isdigit()
