@@ -1,9 +1,15 @@
-""" Contains the SongNode and SongTree Class"""
+""" Contains the SongInfo, ArtistNode, and ArtistTree Class"""
 from typing import Optional
 
-class SongNode:
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
+
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(client_id="5202dc0ad2804ed3ad2de97ec126dd3e",
+                                                           client_secret="0c27609af46b4e83b5804a3564b943da"))
+
+class SongInfo:
     """
-    A node in a tree.
+    Information about a song.
     Contains the attributes of a song. In particular, it contains the song name, the artist name, and
     the 5 song attributes below.
 
@@ -50,30 +56,53 @@ class SongNode:
         self.energy = energy
         self.acoustic = acoustic
 
-class SongTree:
-    """A tree representing the user's favorite song as the root, and its similar songs as the subtrees.
+class ArtistNode:
+    """
+       A node in the ArtistTree.
+       Contains the name of the artist, the artist's id, and their top tracks.
 
-        Each node in the tree is a SongNode
+       Instance Attributes:
+         - artist_name: the name of the artist
+         - artist_id: the id of the artist
+         - top_tracks: the top tracks of the artist
+       """
+    artist_name: str
+    artist_id: str
+    top_tracks: list[SongInfo]
+    def __init__(self, artist_name, artist_id) -> None:
+
+        """Initialize a new ArtistNode.
+        """
+        self.artist_name = artist_name
+        self.artist_id = artist_id
+        top_tracks = sp.artist_top_tracks(artist_id)
+        self.top_tracks = top_tracks
+
+
+class ArtistTree:
+    """A tree representing the user's favorite song's artist as the root, and similar artists as the subtrees.
+
+        Each node in the tree is an ArtistNode
 
         Instance Attributes:
-            - song: the current node of the tree
+            - artist: the current node of the tree
             - depth: the current depth of the tree
         """
-    song: SongNode
+    artist: ArtistNode
     depth: int
 
     # Private Instance Attributes:
     #  - _subtrees:
-    #      the subtrees of this tree, which represent the recommended songs given its parent node.
+    #      the subtrees of this tree, which represent similar artists to its parent node.
     #      _subtrees will be None if we reach the user's given diversity level
-    _subtrees: Optional[list[SongNode]]
+    _subtrees: Optional[list[ArtistNode]]
 
-    def __init__(self, song: SongNode, depth: int, _subtrees: Optional[list[SongNode]]) -> None:
-        """Initialize a new song tree.
+    def __init__(self, artist: ArtistNode, depth: int, _subtrees: Optional[list[ArtistNode]]) -> None:
+        """Initialize a new artist tree.
 
         Note that this initializer uses optional arguments.
 
         """
-        self.song = song
+        self.artist = artist
         self.depth = depth
         self._subtrees = _subtrees
