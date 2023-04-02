@@ -33,7 +33,7 @@ def track_info(track_name: str) -> dict:
     return results
 
 
-def artist_5_related(artist_name: str) -> dict | None:
+def artist_five_related(artist_name: str) -> dict | None:
     """Get the top 5 most related artists to the input artist. Return a dictionary where the key is the artist's
     name and the value is the artist's id.
     """

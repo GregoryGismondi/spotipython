@@ -28,18 +28,21 @@ class User:
         - diversity_level: an integer greater than or equal to zero. This integer corresponds to the depth
         of the artist tree, with a larger level of 'diversity' representing a deeper depth into the tree of artists.
         If the user chooses not to input a number, 'diversity' defaults to 0.
+        - fav_attribute: The user's favorite attribute about their chosen song, if any.
     """
     song_name: str
     artist_name: str
     diversity_level: Optional[int] = 0
+    fav_attribute: Optional[str]
 
-    def __init__(self, song_name: str, artist_name: str, diversity_level: Optional[int] = 0) -> None:
+    def __init__(self, song_name: str, artist_name: str, fav_attribute: Optional[str],
+                 diversity_level: Optional[int] = 0) -> None:
         """Initialize a new User object. Contains the user's preferences.
         """
         self.song_name = song_name
         self.artist_name = artist_name
         self.diversity_level = diversity_level
-
+        self.fav_attribute = fav_attribute
 
 class SongInfo:
     """
@@ -54,6 +57,8 @@ class SongInfo:
     Instance Attributes:
       - song_name: The name of this song
       - artist_name: The name of the artist who wrote this song
+          - difference_score: The difference score between this song and the original song at the root of Artist_Tree
+      - difference_score: The difference score between this song and the original song at the root of Artist_Tree
       - danceability: how suitable a track is for dancing based on a combination of musical elements.
         A value of 0.0 is least danceable and 1.0 is most danceable.
       - valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
@@ -69,6 +74,7 @@ class SongInfo:
     """
     song_name: str
     artist_name: str
+    difference_score: Optional[float]
     danceability: float
     valence: float
     tempo: float
@@ -92,6 +98,7 @@ class SongInfo:
                 self.instrumentalness = features['instrumentalness']
                 self.energy = features['energy']
                 self.acousticness = features['acousticness']
+                break
 
 
 class ArtistNode:
