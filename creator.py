@@ -13,7 +13,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 
 
 @check_contracts
-def create_user():
+def create_user() -> User:
     """Prompts the user to answer some questions and creates a User object
     for the given user input
 
