@@ -33,7 +33,8 @@ def create_user() -> User:
     song_name = input('Enter the name of your favorite song as it appears on Spotify: ')
     artist_name = input('Enter the name of the song\'s corresponding artist as it appears on Spotify: ')
     div_level = input('Diversity level represents how diverse you want your song recommendations to be. \n'
-                      'The higher the number, the more recommendations you will get. Enter an integer \n'
+                      'The higher the number, the more recommendations you will get. We recommend an integer \n'
+                      'that does not exceed 2 in order to get a timely output. Enter an integer \n'
                       'greater than or equal to zero, or press the \'Enter\' key if you choose not to \n'
                       'specify. Note - This will result in a default diversity level of zero: ')
     fav_attribute = input('Enter your favorite attribute of the song out of the following list: \n'
