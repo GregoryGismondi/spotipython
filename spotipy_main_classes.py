@@ -1,7 +1,6 @@
 """ Contains the SongInfo, ArtistNode, and ArtistTree Class"""
 from __future__ import annotations
 from typing import Optional
-
 # Comment out this line when you aren't using check_contracts
 from python_ta.contracts import check_contracts
 
@@ -119,44 +118,119 @@ class ArtistTree:
     """A tree representing the user's favorite song's artist as the root, and similar artists as the subtrees.
 
         Each node in the tree is an ArtistNode
-
-        Instance Attributes:
-            - artist: the current node of the tree
-            - depth: the current depth of the tree
         """
-    artist: ArtistNode
-    depth: int
 
     # Private Instance Attributes:
+    #  - artist: the ArtistNode root of the tree
     #  - _subtrees:
     #      the subtrees of this tree, which represent similar artists to its parent node.
     #      _subtrees will be None if we reach the user's given diversity level
-    _subtrees: Optional[list[ArtistNode]]
+    _artist: Optional[ArtistNode]
+    _subtrees: list[ArtistTree]
 
-    def __init__(self, artist: ArtistNode, depth: int, _subtrees: Optional[list[ArtistNode]]) -> None:
+    def __init__(self, artist: Optional[ArtistNode], subtrees: list[ArtistTree]) -> None:
         """Initialize a new artist tree.
 
         Note that this initializer uses optional arguments.
 
         """
-        self.artist = artist
-        self.depth = depth
-        self._subtrees = _subtrees
+        self._artist = artist
+        self._subtrees = subtrees
 
-    def get_subtrees(self) -> list[ArtistTree]:
+    def __contains__(self, artist: ArtistNode) -> bool:
+        """Return whether this tree contains given the given ArtistNode
+        """
+        if self.is_empty():
+            return False
+        elif not self._subtrees:
+            return self._artist.artist_id == artist.artist_id
+        else:
+            if self._artist.artist_id == artist.artist_id:
+                return True
+            for subtree in self._subtrees:
+                if subtree.__contains__(artist):
+                    return True
+            return False
+
+    def is_empty(self) -> bool:
+        """Return whether this tree is empty.
+        """
+        return self._artist is None
+
+    def get_subtree(self, artist: ArtistNode) -> ArtistTree | None:
         """Return the subtrees of this artist tree."""
-        return list(tree for tree in self._subtrees)
+        if artist not in self:
+            return None
 
-    def insert_subtrees(self, artists: list[ArtistNode], parent_node: ArtistNode) -> None:
+        if self._artist.artist_id == artist:
+            return self
+
+        for subtree in self._subtrees:
+            if artist in subtree:
+                return subtree.get_subtree(artist)
+
+    def populate_subtrees(self, artist: ArtistNode) -> None:
+        """Adds related artists as subtrees to the tree whose root is the given artist
+
+        Preconditions:
+        - artist in self
+        """
+        related_artists_dict = artist_five_related(artist)
+        related_artists_list = []
+
+        for related_artist in related_artists_dict:
+            related_artist_node = ArtistNode(related_artist, related_artists_dict[related_artist])
+            if related_artist_node not in self:
+                related_artists_list.append(related_artist_node)
+
+        if not related_artists_list:
+            return
+
+        self._insert_subtrees(related_artists_list, artist)
+
+    def _insert_subtrees(self, artists: list[ArtistNode], parent_node: ArtistNode) -> None:
         """Inserts the subtree(s) as subtrees of the parent node.
         Note: artists are the related artists to the parent node"""
-        self._subtrees = artists
+        if self.is_empty() or artists == []:
+            return None
+
+        elif self._artist == parent_node:
+            for artist in artists:
+                artist_tree = ArtistTree(artist, [])
+                self._subtrees.append(artist_tree)
+
+        else:
+            for subtree in self._subtrees:
+                subtree._insert_subtrees(artists, parent_node)
+
+
+def artist_five_related(artist: ArtistNode) -> dict:
+    """Get the top 5 most related artists to the input artist. Return a dictionary where the key is the artist's
+    name and the value is the artist's id.
+    """
+    related_artist = sp.artist_related_artists(artist.artist_id)
+
+    related_users = {}
+    for external_urls in related_artist['artists']:
+        if len(related_users) == 5:
+            return related_users
+        else:
+            related_users[external_urls['name']] = external_urls['id']
+
+    return related_users
 
 
 if __name__ == '__main__':
     import doctest
 
     doctest.testmod(verbose=True)
+
+    selena = ArtistNode('Selena Gomez', '0C8ZW7ezQVs4URX5aX7Kqx')
+    taylor = ArtistNode('Taylor Swift', '06HL4z0CvFAxyc27GXpf02')
+    nicki = ArtistNode('Nicki Minaj', '0hCNtLu0JehylgoiP8L4Gh')
+    sza = ArtistNode('SZA', '7tYKF4w9nC0nq9CsPZTHyP')
+
+    tree = ArtistTree(taylor, [ArtistTree(selena, [ArtistTree(nicki, [])]), ArtistTree(sza, [])])
 
     # When you are ready to check your work with python_ta, uncomment the following lines.
     # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)

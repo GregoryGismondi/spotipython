@@ -10,8 +10,8 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 def artist_id(artist_name: str) -> str | None:
-    """Get the given artit's id. 
-    
+    """Get the given artit's id.
+
     Preconditions: The artist_name must be written the way it is on their spotify profile.
     """
     results = sp.search(q=artist_name, type='artist', limit=1)
@@ -23,13 +23,22 @@ def artist_id(artist_name: str) -> str | None:
         return
 
 
+def track_info(track_name: str) -> dict:
+    """Get the given artist of a track.
+    """
+    results = sp.search(q=track_name, type='track', limit=1)
+    # artist = results["tracks"]["items"][0]["artists"][0]["id"]
+    # return ids
+    return results
+
+
 def artist_5_related(artist_name: str) -> dict | None:
-    """Get the top 5 most related artists to the input artist. Return a dictionary where the key is the artist's 
+    """Get the top 5 most related artists to the input artist. Return a dictionary where the key is the artist's
     name and the value is the artist's id.
     """
     ids = artist_id(artist_name)
     if ids is None:
-        return 
+        return
 
     related_artist = sp.artist_related_artists(ids)
 
