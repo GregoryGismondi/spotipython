@@ -3,7 +3,7 @@
 """
 import spotipy
 import artist_tree
-import spotipy_create_obj
+import creator
 from spotipy.oauth2 import SpotifyClientCredentials
 
 
