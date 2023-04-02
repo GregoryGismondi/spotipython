@@ -91,7 +91,7 @@ class SongInfo:
         diff_danceability = abs(og_song.danceability - self.danceability)
         diff_valence = abs(og_song.valence - self.valence)
         # The difference in tempo is much greater, therefore we have to nerf its power by diving by 100
-        diff_tempo = abs(og_song.tempo - self.valence) / 200
+        diff_tempo = abs(og_song.tempo - self.valence) / 100
         diff_instrumentalness = abs(og_song.instrumentalness - self.instrumentalness)
         diff_energy = abs(og_song.energy - self.energy)
         diff_acousticness = abs(og_song.acousticness - self.acousticness)
