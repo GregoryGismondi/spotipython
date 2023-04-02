@@ -8,6 +8,9 @@ from python_ta.contracts import check_contracts
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
+from test import artist_5_top_songs
+from spotipy_create_obj import create_song_info
+
 app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
 app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
 
@@ -107,8 +110,9 @@ class ArtistNode:
         """
         self.artist_name = artist_name
         self.artist_id = artist_id
-        top_tracks = sp.artist_top_tracks(artist_id)
-        self.top_tracks = top_tracks
+        top_tracks = artist_5_top_songs(artist_name)
+        song_info_tracks = [create_song_info(x, top_tracks[x]) for x in top_tracks]
+        self.top_tracks = song_info_tracks
 
 
 class ArtistTree:
