@@ -88,6 +88,7 @@ class SongInfo:
                 self.artist_name = artist_name
                 self.danceability = features['danceability']
                 self.valence = features['valence']
+                self.tempo = features['tempo']
                 self.instrumentalness = features['instrumentalness']
                 self.energy = features['energy']
                 self.acousticness = features['acousticness']
