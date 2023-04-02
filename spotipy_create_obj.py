@@ -52,3 +52,58 @@ def create_user() -> main_classes.User:
         return main_classes.User(song_name, artist_name, div_level)
     else:
         return main_classes.User(song_name, artist_name, div_level, fav_attribute)
+    
+def difference_score(user: main_classes.User, og_song: main_classes.SongInfo, new_song: main_classes.SongInfo) -> float:
+    """ Calculates a difference score from 0.0 (very similar) to 1.0 (very different) between the original
+    song and the new song based on the difference in values between each attribute of the song.
+    If the user chose a particular characteristic they liked about the original song, it will make up 50%
+    of the weighting when calculating the difference score, while the 5 other attributes would make up the
+    rest, at 10% each. If no characteristic was chosen, then all characteristics are weighed equally.
+
+    This score is calculated by finding the absolute value of the difference for each attribute, applying the
+    appropriate weighting, summing up the values, and dividing the entire thing by the number of attributes
+    there are.
+
+    Updates the new_song info to contain its score.
+    """
+    diff_danceability = abs(og_song.danceability - new_song.danceability)
+    diff_valence = abs(og_song.valence - new_song.valence)
+    diff_tempo = abs(og_song.tempo - new_song.valence)
+    diff_instrumentalness = abs(og_song.instrumentalness - new_song.instrumentalness)
+    diff_energy = abs(og_song.energy - new_song.energy)
+    diff_acousticness = abs(og_song.acousticness - new_song.acousticness)
+    
+    if user.fav_attribute is None:
+        total = diff_danceability + diff_valence + diff_tempo + diff_instrumentalness + diff_energy + diff_acousticness
+        avg = total/6
+        new_song.difference_score = avg
+        return avg
+    elif user.fav_attribute == 'danceability':
+        avg = diff_danceability*0.5 + diff_valence*0.1 + diff_tempo*0.1 + diff_instrumentalness*0.1 + \
+              diff_energy*0.1 + diff_acousticness*0.1
+        new_song.difference_score = avg
+        return avg
+    elif user.fav_attribute == 'valence':
+        avg = diff_danceability * 0.1 + diff_valence * 0.5 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
+              diff_energy * 0.1 + diff_acousticness * 0.1
+        return avg
+    elif user.fav_attribute == 'tempo':
+        avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.5 + diff_instrumentalness * 0.1 + \
+              diff_energy * 0.1 + diff_acousticness * 0.1
+        new_song.difference_score = avg
+        return avg
+    elif user.fav_attribute == 'instrumentalness':
+        avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.5 + \
+              diff_energy * 0.1 + diff_acousticness * 0.1
+        new_song.difference_score = avg
+        return avg
+    elif user.fav_attribute == 'energy':
+        avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
+              diff_energy * 0.5 + diff_acousticness * 0.1
+        new_song.difference_score = avg
+        return avg
+    elif user.fav_attribute == 'acousticness':
+        avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
+              diff_energy * 0.1 + diff_acousticness * 0.5
+        new_song.difference_score = avg
+        return avg
