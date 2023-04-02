@@ -29,6 +29,9 @@ def create_user() -> main_classes.User:
 
     Representation Invariants:
     - div_level == '' or div_level.isdigit()
+    - fav_attribute == 'danceability' or fav_attribute == 'valence' or \n
+    fav_attribute == 'tempo' or fav_attribute == 'instrumentalness' or fav_attribute == 'energy' or \n
+    fav_attribute == 'acousticness' or fav_attribute == ''
 
     """
     song_name = input('Enter the name of your favorite song as it appears on Spotify: ')
@@ -37,8 +40,15 @@ def create_user() -> main_classes.User:
                       'The higher the number, the more recommendations you will get. Enter an integer \n'
                       'greater than or equal to zero, or press the \'Enter\' key if you choose not to \n'
                       'specify. Note: This will result in a default diversity level of zero.')
+    fav_attribute = input('Enter your favorite attribute of the song out of the following list: \n'
+                          'danceability, valence, tempo, instrumentalness, energy, acousticness. \n'
+                          'Or, press the \'Enter\' key if you have no preference.')
     if div_level == '':
         div_level = 0
     else:
         div_level = int(div_level)  # before div_level was a str representation of an int
-    return main_classes.User(song_name, artist_name, div_level)
+    
+    if fav_attribute == '':
+        return main_classes.User(song_name, artist_name, div_level)
+    else:
+        return main_classes.User(song_name, artist_name, div_level, fav_attribute)
