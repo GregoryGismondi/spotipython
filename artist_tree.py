@@ -58,7 +58,10 @@ class SongInfo:
         tracks = sp.search(q=song_name, type='track')['tracks']
         items = tracks['items']
         for item in items:
-            same_artist = {item['artists'][i]['name'] == artist_name for i in range(0, len(item['artists']))}
+            if 'artists' in item:
+                same_artist = {item['artists'][i]['name'] == artist_name for i in range(0, len(item['artists']))}
+            else:
+                same_artist = {False}
             if item['name'] in song_name and (True in same_artist):
                 features = sp.audio_features(item['id'])[0]
                 self.song_name = song_name
@@ -270,7 +273,7 @@ class ArtistTree:
 
             self._populate_subtree(self._artist, original_tree)
 
-        if d + 1 > 0:
+        if d - 1 > 0:
             for subtree in self._subtrees:
                 subtree.populate_subtrees(d - 1, original_tree)
 
