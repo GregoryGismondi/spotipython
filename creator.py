@@ -5,25 +5,18 @@ from typing import Optional
 # Comment out this line when you aren't using check_contracts
 from python_ta.contracts import check_contracts
 
-import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-import spotipy_main_classes as main_classes
-
-app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
-app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
-
-client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, client_secret=app_client_secret)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+from user import User
+import artist_tree
 
 
 @check_contracts
-def create_user() -> main_classes.User:
+def create_user() -> User:
     """Prompts the user to answer some questions and creates a User object
     for the given user input
 
     Asks for the user's favorite song, its corresponding artist, and the user's desired
     diversity level.
-    
+
     Preconditions:
     - The user's input for song_name and corresponding artist_name are valid names in Spotify.
 
@@ -47,14 +40,15 @@ def create_user() -> main_classes.User:
         div_level = 0
     else:
         div_level = int(div_level)  # before div_level was a str representation of an int
-    
+
     if fav_attribute == '':
-        return main_classes.User(song_name, artist_name, div_level)
+        return User(song_name, artist_name, None, div_level)
     else:
-        return main_classes.User(song_name, artist_name, div_level, fav_attribute)
-    
-def difference_score(user: main_classes.User, og_song: main_classes.SongInfo, new_song: main_classes.SongInfo) -> float:
-    """ Calculates a difference score between the original song and the new song based on the difference in values 
+        return User(song_name, artist_name, fav_attribute, div_level)
+
+
+def difference_score(user: User, og_song: artist_tree.SongInfo, new_song: artist_tree.SongInfo) -> float:
+    """ Calculates a difference score between the original song and the new song based on the difference in values
     between each attribute of the song. This 'score' is a non-negative float. A score of 0.0 means the new song
     is very similar to the original song, while a higher score indicates the new_song is more different from the
     original. If the user chose a particular characteristic they liked about the original song, it will make up 50%
@@ -73,7 +67,7 @@ def difference_score(user: main_classes.User, og_song: main_classes.SongInfo, ne
     diff_instrumentalness = abs(og_song.instrumentalness - new_song.instrumentalness)
     diff_energy = abs(og_song.energy - new_song.energy)
     diff_acousticness = abs(og_song.acousticness - new_song.acousticness)
-    
+
     if user.fav_attribute is None:
         total = diff_danceability + diff_valence + diff_tempo + diff_instrumentalness + diff_energy + diff_acousticness
         avg = total/6
