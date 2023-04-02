@@ -5,51 +5,15 @@ from typing import Optional
 # Comment out this line when you aren't using check_contracts
 from python_ta.contracts import check_contracts
 
+import random
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
-from test import artist_five_tracks, artist_id
 
-app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
-app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
-
-client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, client_secret=app_client_secret)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-
-
-class User:
-    """
-    Information about the user's preferences.
-    Contains the user's favorite song, the corresponding artist, the user's desired diversity level,
-    and the user's favorite attribute about their favorite song, if any.
-
-    Instance Attributes:
-        - song_name: The name of the user's favorite song
-        - artist_name: The name of the corresponding artist to song_name
-        - diversity_level: an integer greater than or equal to zero. This integer corresponds to the depth
-        of the artist tree, with a larger level of 'diversity' representing a deeper depth into the tree of artists.
-        If the user chooses not to input a number, 'diversity' defaults to 0.
-        - fav_attribute: The user's favorite attribute about their chosen song, if any.
-    """
-    song_name: str
-    artist_name: str
-    diversity_level: Optional[int] = 0
-    fav_attribute: Optional[str]
-
-    def __init__(self, song_name: str, artist_name: str, fav_attribute: Optional[str],
-                 diversity_level: Optional[int] = 0) -> None:
-        """Initialize a new User object. Contains the user's preferences.
-        """
-        self.song_name = song_name
-        self.artist_name = artist_name
-        self.diversity_level = diversity_level
-        self.fav_attribute = fav_attribute
 
 class SongInfo:
     """
     Information about a song.
     Contains the attributes of a song. In particular, it contains the song name, the artist name, and
     the 5 song attributes below.
-
 
     Credit for the descriptions of the last 5 instance attributes is attributed to the Spotify Developer documentation:
     https://developer.spotify.com/documentation/web-api/reference/get-audio-features
@@ -81,10 +45,12 @@ class SongInfo:
     instrumentalness: float
     energy: float
     acousticness: float
+    sp: spotipy.Spotify
 
-    def __init__(self, song_name: str, artist_name: str) -> None:
+    def __init__(self, song_name: str, artist_name: str, sp: spotipy.Spotify) -> None:
         """Initialize a new SongNode.
         """
+        self.sp = sp
         tracks = sp.search(q=song_name, type='track')['tracks']
         items = tracks['items']
         for item in items:
@@ -115,13 +81,16 @@ class ArtistNode:
     artist_id: str
     top_tracks: list[SongInfo]
 
-    def __init__(self, artist_name: str) -> None:
+    def __init__(self, artist_name: str, artist_id: Optional[str], sp: spotipy.Spotify) -> None:
         """Initialize a new ArtistNode.
         """
         self.artist_name = artist_name
-        self.artist_id = artist_id(artist_name)
-        top_tracks = artist_five_tracks(artist_name)
-        song_info_tracks = [SongInfo(song_name, top_tracks[song_name]) for song_name in top_tracks]
+        if artist_id is None:
+            self.artist_id = get_artist_id(artist_name, sp)
+        else:
+            self.artist_id = artist_id
+        top_tracks = artist_five_tracks(self.artist_name, self.artist_id, sp)
+        song_info_tracks = [SongInfo(song_name, top_tracks[song_name], sp) for song_name in top_tracks]
         self.top_tracks = song_info_tracks
 
 
@@ -133,6 +102,7 @@ class ArtistTree:
         Instance Attributes:
             - artist: the current node of the tree
         """
+    sp = spotipy.Spotify
 
     # Private Instance Attributes:
     #  - _subtrees:
@@ -141,7 +111,7 @@ class ArtistTree:
     _subtrees: list[ArtistTree]
     _artist: Optional[ArtistNode]
 
-    def __init__(self, _artist: Optional[ArtistNode], _subtrees: list[ArtistTree]) -> None:
+    def __init__(self, _artist: Optional[ArtistNode], _subtrees: list[ArtistTree], sp: spotipy.Spotify) -> None:
         """Initialize a new artist tree.
 
         Note that this initializer uses optional arguments.
@@ -149,18 +119,7 @@ class ArtistTree:
         """
         self._artist = _artist
         self._subtrees = _subtrees
-
-    # def get_subtrees(self) -> list[ArtistTree]:
-    #     """Return the subtrees of this artist tree."""
-    #     return list(tree for tree in self._subtrees)
-
-    # def insert_subtrees(self, artists: list[ArtistNode], parent_node: ArtistNode) -> None:
-    #     if self._artist.artist_id == artist:
-    #         return self
-    #
-    #     for subtree in self._subtrees:
-    #         if artist in subtree:
-    #             return subtree.get_subtree(artist)
+        self.sp = sp
 
     def __contains__(self, artist: ArtistNode) -> bool:
         """Return whether this tree contains given the given ArtistNode
@@ -192,7 +151,7 @@ class ArtistTree:
             return
 
         if original_tree is None:
-            original_tree = ArtistTree(self._artist, self._subtrees)
+            original_tree = ArtistTree(self._artist, self._subtrees, self.sp)
 
         self._populate_subtree(self._artist, original_tree)
 
@@ -206,12 +165,12 @@ class ArtistTree:
         Preconditions:
         - artist in self
         """
-        related_artists_dict = artist_five_related(artist)
+        related_artists_dict = artist_five_related(artist, self.sp)
         related_artists_list = []
 
         for related_artist in related_artists_dict:
-            # related_artist_node = ArtistNode(related_artist, related_artists_dict[related_artist])
-            related_artist_node = ArtistNode(related_artist)
+            related_artist_node = ArtistNode(related_artist, related_artists_dict[related_artist], self.sp)
+            # related_artist_node = ArtistNode(related_artist)
             if related_artist_node not in original_tree:
                 related_artists_list.append(related_artist_node)
 
@@ -225,7 +184,7 @@ class ArtistTree:
 
         elif self._artist == parent_node:
             for artist in artists:
-                artist_tree = ArtistTree(artist, [])
+                artist_tree = ArtistTree(artist, [], self.sp)
                 self._subtrees.append(artist_tree)
 
         else:
@@ -233,7 +192,7 @@ class ArtistTree:
                 subtree._insert_subtrees(artists, parent_node)
 
 
-def artist_five_related(artist: ArtistNode) -> dict:
+def artist_five_related(artist: ArtistNode, sp: spotipy.Spotify) -> dict:
     """Get the top 5 most related artists to the input artist. Return a dictionary where the key is the artist's
     name and the value is the artist's id.
     """
@@ -247,6 +206,29 @@ def artist_five_related(artist: ArtistNode) -> dict:
             related_users[external_urls['name']] = external_urls['id']
 
     return related_users
+
+
+def get_artist_id(artist_name: str, sp: spotipy.Spotify) -> str:
+    """Get the given artit's id.
+
+    Preconditions: The artist_name must be written the way it is on their spotify profile.
+    """
+    results = sp.search(q=artist_name, type='artist', limit=1)
+    ids = results["artists"]["items"][0]["id"]
+    return ids
+
+
+def artist_five_tracks(artist_name: str, artist_id: str, sp: spotipy.Spotify, country: str = 'CA') -> dict:
+    """Return 5 random top tracks from the given artist.
+    """
+    top_tracks = sp.artist_top_tracks(artist_id, country)
+
+    track_names = {}
+    for item in top_tracks['tracks']:
+        track_names[item['name']] = artist_name
+
+    random_five = random.sample(list(track_names.items()), k=5)
+    return dict(random_five)
 
 
 if __name__ == '__main__':

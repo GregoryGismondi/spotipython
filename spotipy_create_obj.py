@@ -7,7 +7,8 @@ from python_ta.contracts import check_contracts
 
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import spotipy_main_classes as main_classes
+import artist_tree
+from user import User
 
 app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
 app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
@@ -17,13 +18,13 @@ sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
 @check_contracts
-def create_user() -> main_classes.User:
+def create_user() -> User:
     """Prompts the user to answer some questions and creates a User object
     for the given user input
 
     Asks for the user's favorite song, its corresponding artist, and the user's desired
     diversity level.
-    
+
     Preconditions:
     - The user's input for song_name and corresponding artist_name are valid names in Spotify.
 
@@ -47,8 +48,8 @@ def create_user() -> main_classes.User:
         div_level = 0
     else:
         div_level = int(div_level)  # before div_level was a str representation of an int
-    
+
     if fav_attribute == '':
-        return main_classes.User(song_name, artist_name, div_level)
+        return User(song_name, artist_name, None, div_level)
     else:
-        return main_classes.User(song_name, artist_name, div_level, fav_attribute)
+        return User(song_name, artist_name, fav_attribute, div_level)
