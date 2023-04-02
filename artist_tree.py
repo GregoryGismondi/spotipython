@@ -64,14 +64,15 @@ class SongInfo:
                 same_artist = {False}
             if item['name'] in song_name and (True in same_artist):
                 features = sp.audio_features(item['id'])[0]
-                self.song_name = song_name
-                self.artist_name = artist_name
-                self.danceability = features['danceability']
-                self.valence = features['valence']
-                self.tempo = features['tempo']
-                self.instrumentalness = features['instrumentalness']
-                self.energy = features['energy']
-                self.acousticness = features['acousticness']
+                if features is not None:
+                    self.song_name = song_name
+                    self.artist_name = artist_name
+                    self.danceability = features['danceability']
+                    self.valence = features['valence']
+                    self.tempo = features['tempo']
+                    self.instrumentalness = features['instrumentalness']
+                    self.energy = features['energy']
+                    self.acousticness = features['acousticness']
                 break
 
     def difference_scorer(self, curr_user: User, og_song: SongInfo) -> float:
@@ -238,7 +239,13 @@ class ArtistTree:
         if min_song is None:
             min_song = {}
 
-        differences_root = {song.difference_score: song for song in self._artist.top_tracks}
+        differences_root = {}
+
+        for song in self._artist.top_tracks:
+            if hasattr(song, 'difference_score'):
+                differences_root[song.difference_score] = song
+
+        # differences_root = {song.difference_score: song for song in self._artist.top_tracks}
         least_difference_root = differences_root[min(differences_root)]
 
         if d in min_song:
@@ -336,7 +343,8 @@ def get_artist_id(artist_name: str, sp: spotipy.Spotify) -> str:
     return ids
 
 
-def artist_five_tracks(artist_name: str, artist_id: str, user: User, sp: spotipy.Spotify, country: str = 'CA') -> dict:
+def artist_five_tracks(artist_name: str, artist_id: str, user: User, sp: spotipy.Spotify, country: str = 'CA') \
+        -> dict:
     """Return 5 random top tracks from the given artist.
     """
     top_tracks = sp.artist_top_tracks(artist_id, country)
@@ -346,8 +354,11 @@ def artist_five_tracks(artist_name: str, artist_id: str, user: User, sp: spotipy
         if user.song_name not in item['name']:
             track_names[item['name']] = artist_name
 
-    random_five = random.sample(list(track_names.items()), k=5)
-    return dict(random_five)
+    if len(list(track_names.items())) >= 5:
+        random_five = random.sample(list(track_names.items()), k=5)
+        return dict(random_five)
+    else:
+        return track_names
 
 
 if __name__ == '__main__':
