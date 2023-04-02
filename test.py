@@ -41,3 +41,18 @@ def artist_5_related(artist_name: str) -> dict | None:
             related_users[external_urls['name']] = external_urls['id']
 
     return related_users
+
+
+def artist_5_top_songs(artist_name: str, country: str = 'CA') -> dict | None:
+    ids = artist_id(artist_name)
+    if ids is None:
+        return
+
+    top_tracks = sp.artist_top_tracks(ids, country)
+
+    top_five = {}
+    for item in top_tracks['tracks']:
+        if len(top_five) == 5:
+            return top_five
+        else:
+            top_five[item['name']] = artist_name
