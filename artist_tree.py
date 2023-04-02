@@ -164,7 +164,7 @@ class ArtistNode:
             if hasattr(song_info, 'danceability'):
                 song_info_tracks_correct.append(song_info)
 
-        for song_info in song_info_tracks:
+        for song_info in song_info_tracks_correct:
             song_info.difference_scorer(user, user_song)
 
         self.top_tracks = song_info_tracks
