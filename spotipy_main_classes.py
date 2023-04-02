@@ -57,6 +57,8 @@ class SongInfo:
     Instance Attributes:
       - song_name: The name of this song
       - artist_name: The name of the artist who wrote this song
+          - difference_score: The difference score between this song and the original song at the root of Artist_Tree
+      - difference_score: The difference score between this song and the original song at the root of Artist_Tree
       - danceability: how suitable a track is for dancing based on a combination of musical elements.
         A value of 0.0 is least danceable and 1.0 is most danceable.
       - valence: A measure from 0.0 to 1.0 describing the musical positiveness conveyed by a track.
@@ -72,6 +74,7 @@ class SongInfo:
     """
     song_name: str
     artist_name: str
+    difference_score: Optional[float]
     danceability: float
     valence: float
     tempo: float
@@ -95,6 +98,7 @@ class SongInfo:
                 self.instrumentalness = features['instrumentalness']
                 self.energy = features['energy']
                 self.acousticness = features['acousticness']
+                break
 
 
 class ArtistNode:
