@@ -16,23 +16,6 @@ client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, c
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
 
-def create_song_info(song_name: str, artist_name: str) -> main_classes.SongInfo:
-    """Creates a SongInfo object for the given song and its corresponding artist.
-
-    Preconditions: The song and artist must be valid and written the way it is on spotify.
-    """
-    tracks = sp.search(q=song_name, type='track')['tracks']
-    items = tracks['items']
-    for item in items:
-        if item['name'] == song_name and item['artists'][0]['name'] == artist_name:
-            features = sp.audio_features(item['id'])[0]
-            new_song = main_classes.SongInfo(song_name, artist_name, features['danceability'],
-                 features['valence'], features['tempo'], features['instrumentalness'],
-                 features['energy'], features['acousticness'])
-            return new_song
-        else:
-            print("No corresponding song and artist on spotify.")
-
 @check_contracts
 def create_user() -> main_classes.User:
     """Prompts the user to answer some questions and creates a User object
