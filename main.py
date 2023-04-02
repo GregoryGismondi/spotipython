@@ -1,27 +1,26 @@
 """CSC111: Spotipython Project - Main File
-
 """
-import spotipy
 import artist_tree
 import creator
-from spotipy.oauth2 import SpotifyClientCredentials
 
 
-def create_app() -> spotipy.Spotify:
-    """Creates a Spotify API class using Spotipy funcitons
+def recommend_song() -> None:
+    """Recommends song based off of user's input
     """
-    app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
-    app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
+    user = creator.create_user()
+    app = creator.create_app()
 
-    client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, client_secret=app_client_secret)
-    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-    return sp
+    user_artist = artist_tree.ArtistNode(user.artist_name, None, user, app)
+    user_tree = artist_tree.ArtistTree(user_artist, [], user, app)
 
+    user_tree.populate_subtrees(user.diversity_level, None)
+    least_difference = user_tree.min_difference_score(None)
 
-def recommend_song():
-    pass
+    for depth in least_difference:
+        print("\nThe recommended song at depth " + str(depth) + " is: " + least_difference[depth].song_name + " by " +
+              least_difference[depth].artist_name)
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    sp = create_app()
+    recommend_song()

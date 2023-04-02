@@ -1,4 +1,5 @@
-""" Contains the SongInfo, ArtistNode, and ArtistTree Class"""
+"""CSC111: Spotipython Project - ArtistTree File
+Defining code and methods for SongInfo, ArtistInfo, ArtistTree, as well as other helper funcitons"""
 from __future__ import annotations
 from typing import Optional
 
@@ -7,6 +8,7 @@ from python_ta.contracts import check_contracts
 
 import random
 import spotipy
+from user import User
 
 
 class SongInfo:
@@ -46,15 +48,18 @@ class SongInfo:
     energy: float
     acousticness: float
     sp: spotipy.Spotify
+    user: User
 
-    def __init__(self, song_name: str, artist_name: str, sp: spotipy.Spotify) -> None:
+    def __init__(self, song_name: str, artist_name: str, user: User, sp: spotipy.Spotify) -> None:
         """Initialize a new SongNode.
         """
         self.sp = sp
+        self.user = user
         tracks = sp.search(q=song_name, type='track')['tracks']
         items = tracks['items']
         for item in items:
-            if item['name'] == song_name and item['artists'][0]['name'] == artist_name:
+            same_artist = {item['artists'][i]['name'] == artist_name for i in range(0, len(item['artists']))}
+            if item['name'] in song_name and (True in same_artist):
                 features = sp.audio_features(item['id'])[0]
                 self.song_name = song_name
                 self.artist_name = artist_name
@@ -65,6 +70,64 @@ class SongInfo:
                 self.energy = features['energy']
                 self.acousticness = features['acousticness']
                 break
+
+    def difference_scorer(self, curr_user: User, og_song: SongInfo) -> float:
+        """ Calculates a difference score between the original song and the new song based on the difference in values
+        between each attribute of the song. This 'score' is a non-negative float. A score of 0.0 means the new song
+        is very similar to the original song, while a higher score indicates the new_song is more different from the
+        original. If the user chose a particular characteristic they liked about the original song, it will make up 50%
+        of the weighting when calculating the difference score, while the 5 other attributes would make up the
+        rest, at 10% each. If no characteristic was chosen, then all characteristics are weighed equally.
+
+        This score is calculated by finding the absolute value of the difference for each attribute, applying the
+        appropriate weighting, summing up the values, and dividing the entire thing by the number of attributes
+        there are.
+
+        Updates the new_song info to contain its score.
+        """
+        diff_danceability = abs(og_song.danceability - self.danceability)
+        diff_valence = abs(og_song.valence - self.valence)
+        # The difference in tempo is much greater, therefore we have to nerf its power by diving by 100
+        diff_tempo = abs(og_song.tempo - self.valence) / 200
+        diff_instrumentalness = abs(og_song.instrumentalness - self.instrumentalness)
+        diff_energy = abs(og_song.energy - self.energy)
+        diff_acousticness = abs(og_song.acousticness - self.acousticness)
+
+        if curr_user.fav_attribute is None:
+            total = diff_danceability + diff_valence + diff_tempo + diff_instrumentalness + \
+                    diff_energy + diff_acousticness
+            avg = total / 6
+            self.difference_score = avg
+            return avg
+        elif curr_user.fav_attribute == 'danceability':
+            avg = diff_danceability * 0.5 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
+                  diff_energy * 0.1 + diff_acousticness * 0.1
+            self.difference_score = avg
+            return avg
+        elif curr_user.fav_attribute == 'valence':
+            avg = diff_danceability * 0.1 + diff_valence * 0.5 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
+                  diff_energy * 0.1 + diff_acousticness * 0.1
+            return avg
+        elif curr_user.fav_attribute == 'tempo':
+            avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.5 + diff_instrumentalness * 0.1 + \
+                  diff_energy * 0.1 + diff_acousticness * 0.1
+            self.difference_score = avg
+            return avg
+        elif curr_user.fav_attribute == 'instrumentalness':
+            avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.5 + \
+                  diff_energy * 0.1 + diff_acousticness * 0.1
+            self.difference_score = avg
+            return avg
+        elif curr_user.fav_attribute == 'energy':
+            avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
+                  diff_energy * 0.5 + diff_acousticness * 0.1
+            self.difference_score = avg
+            return avg
+        elif curr_user.fav_attribute == 'acousticness':
+            avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
+                  diff_energy * 0.1 + diff_acousticness * 0.5
+            self.difference_score = avg
+            return avg
 
 
 class ArtistNode:
@@ -80,8 +143,9 @@ class ArtistNode:
     artist_name: str
     artist_id: str
     top_tracks: list[SongInfo]
+    user: User
 
-    def __init__(self, artist_name: str, artist_id: Optional[str], sp: spotipy.Spotify) -> None:
+    def __init__(self, artist_name: str, artist_id: Optional[str], user: User, sp: spotipy.Spotify) -> None:
         """Initialize a new ArtistNode.
         """
         self.artist_name = artist_name
@@ -89,8 +153,20 @@ class ArtistNode:
             self.artist_id = get_artist_id(artist_name, sp)
         else:
             self.artist_id = artist_id
-        top_tracks = artist_five_tracks(self.artist_name, self.artist_id, sp)
-        song_info_tracks = [SongInfo(song_name, top_tracks[song_name], sp) for song_name in top_tracks]
+        self.user = user
+        top_tracks = artist_five_tracks(self.artist_name, self.artist_id, user, sp)
+        song_info_tracks = [SongInfo(song_name, top_tracks[song_name], user, sp) for song_name in top_tracks]
+        user_song = SongInfo(user.song_name, user.artist_name, user, sp)
+
+        song_info_tracks_correct = []
+
+        for song_info in song_info_tracks:
+            if hasattr(song_info, 'danceability'):
+                song_info_tracks_correct.append(song_info)
+
+        for song_info in song_info_tracks:
+            song_info.difference_scorer(user, user_song)
+
         self.top_tracks = song_info_tracks
 
 
@@ -110,8 +186,10 @@ class ArtistTree:
     #      _subtrees will be None if we reach the user's given diversity level
     _subtrees: list[ArtistTree]
     _artist: Optional[ArtistNode]
+    _user: User
 
-    def __init__(self, _artist: Optional[ArtistNode], _subtrees: list[ArtistTree], sp: spotipy.Spotify) -> None:
+    def __init__(self, _artist: Optional[ArtistNode], _subtrees: list[ArtistTree],
+                 user: User, sp: spotipy.Spotify) -> None:
         """Initialize a new artist tree.
 
         Note that this initializer uses optional arguments.
@@ -119,6 +197,7 @@ class ArtistTree:
         """
         self._artist = _artist
         self._subtrees = _subtrees
+        self._user = user
         self.sp = sp
 
     def __contains__(self, artist: ArtistNode) -> bool:
@@ -141,6 +220,41 @@ class ArtistTree:
         """
         return self._artist is None
 
+    def min_difference_score(self, min_song: dict | None, d: int = 0) -> dict[int: SongInfo]:
+        """Finds and returns the SongInfo with the least difference_score at each depth.
+
+        The SongInfo will be returned with a dictionary, with the key being the depth of the SongInfo
+        object in the ArtistTree and the associated value being the SongInfo object with the least_difference
+        score at the depth of its key value.
+
+        If there is a tie, it will recommend the first song
+        """
+        if self.is_empty():
+            return {}
+
+        if min_song is None:
+            min_song = {}
+
+        differences_root = {song.difference_score: song for song in self._artist.top_tracks}
+        least_difference_root = differences_root[min(differences_root)]
+
+        if d in min_song:
+            if min_song[d].difference_score > least_difference_root.difference_score:
+                min_song[d] = least_difference_root
+        else:
+            min_song[d] = least_difference_root
+
+        for subtree in self._subtrees:
+            rec_value = subtree.min_difference_score(min_song, d + 1)
+            if d + 1 in min_song:
+                if rec_value != {}:
+                    if min_song[d + 1].difference_score > rec_value[d + 1].difference_score:
+                        min_song[d + 1] = rec_value[d + 1]
+            else:
+                min_song[d + 1] = rec_value[d + 1]
+            return min_song
+        return min_song
+
     def populate_subtrees(self, d: int, original_tree: Optional[ArtistTree] = None) -> None:
         """Recurssivly adds related artists as subtrees until the tree has a height of d
 
@@ -150,12 +264,13 @@ class ArtistTree:
         if self.is_empty():
             return
 
-        if original_tree is None:
-            original_tree = ArtistTree(self._artist, self._subtrees, self.sp)
-
-        self._populate_subtree(self._artist, original_tree)
-
         if d > 0:
+            if original_tree is None:
+                original_tree = ArtistTree(self._artist, self._subtrees, self._user, self.sp)
+
+            self._populate_subtree(self._artist, original_tree)
+
+        if d + 1 > 0:
             for subtree in self._subtrees:
                 subtree.populate_subtrees(d - 1, original_tree)
 
@@ -169,7 +284,7 @@ class ArtistTree:
         related_artists_list = []
 
         for related_artist in related_artists_dict:
-            related_artist_node = ArtistNode(related_artist, related_artists_dict[related_artist], self.sp)
+            related_artist_node = ArtistNode(related_artist, related_artists_dict[related_artist], self._user, self.sp)
             # related_artist_node = ArtistNode(related_artist)
             if related_artist_node not in original_tree:
                 related_artists_list.append(related_artist_node)
@@ -184,7 +299,7 @@ class ArtistTree:
 
         elif self._artist == parent_node:
             for artist in artists:
-                artist_tree = ArtistTree(artist, [], self.sp)
+                artist_tree = ArtistTree(artist, [], self._user, self.sp)
                 self._subtrees.append(artist_tree)
 
         else:
@@ -218,14 +333,15 @@ def get_artist_id(artist_name: str, sp: spotipy.Spotify) -> str:
     return ids
 
 
-def artist_five_tracks(artist_name: str, artist_id: str, sp: spotipy.Spotify, country: str = 'CA') -> dict:
+def artist_five_tracks(artist_name: str, artist_id: str, user: User, sp: spotipy.Spotify, country: str = 'CA') -> dict:
     """Return 5 random top tracks from the given artist.
     """
     top_tracks = sp.artist_top_tracks(artist_id, country)
 
     track_names = {}
     for item in top_tracks['tracks']:
-        track_names[item['name']] = artist_name
+        if user.song_name not in item['name']:
+            track_names[item['name']] = artist_name
 
     random_five = random.sample(list(track_names.items()), k=5)
     return dict(random_five)

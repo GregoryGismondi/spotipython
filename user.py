@@ -1,3 +1,5 @@
+"""CSC111: Spotipython Project - User File
+Stores user's inputs in the User Calss"""
 from __future__ import annotations
 from typing import Optional
 
