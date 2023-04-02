@@ -108,7 +108,7 @@ class ArtistNode:
     artist_id: str
     top_tracks: list[SongInfo]
 
-    def __init__(self, artist_name) -> None:
+    def __init__(self, artist_name: str) -> None:
         """Initialize a new ArtistNode.
         """
         self.artist_name = artist_name
