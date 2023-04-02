@@ -54,9 +54,10 @@ def create_user() -> main_classes.User:
         return main_classes.User(song_name, artist_name, div_level, fav_attribute)
     
 def difference_score(user: main_classes.User, og_song: main_classes.SongInfo, new_song: main_classes.SongInfo) -> float:
-    """ Calculates a difference score from 0.0 (very similar) to 1.0 (very different) between the original
-    song and the new song based on the difference in values between each attribute of the song.
-    If the user chose a particular characteristic they liked about the original song, it will make up 50%
+    """ Calculates a difference score between the original song and the new song based on the difference in values 
+    between each attribute of the song. This 'score' is a non-negative float. A score of 0.0 means the new song
+    is very similar to the original song, while a higher score indicates the new_song is more different from the
+    original. If the user chose a particular characteristic they liked about the original song, it will make up 50%
     of the weighting when calculating the difference score, while the 5 other attributes would make up the
     rest, at 10% each. If no characteristic was chosen, then all characteristics are weighed equally.
 
