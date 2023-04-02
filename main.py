@@ -4,6 +4,7 @@
 import spotipy
 import recommender
 import spotipy_main_classes
+import spotipy_create_obj
 from spotipy.oauth2 import SpotifyClientCredentials
 
 
@@ -18,8 +19,10 @@ def create_app() -> spotipy.Spotify:
     return sp
 
 
-def recommend_song(song_name: str, d: int = 1):
+def recommend_song():
     # STEP 1: GET ARTIST FROM SONG
+    user = spotipy_create_obj.create_user()
+
 
     # temp variables - Taylor Swift's Daylight
     artist_id = '06HL4z0CvFAxyc27GXpf02'
@@ -31,6 +34,8 @@ def recommend_song(song_name: str, d: int = 1):
     # STEP 2: CREATE TREE OF ARTISTS
     root_artist = spotipy_main_classes.ArtistNode('Taylor Swift', artist_id)
     artist_tree = spotipy_main_classes.ArtistTree(root_artist, [])
+
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':

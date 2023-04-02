@@ -1,5 +1,6 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import random
 
 app_client_id = "10ad55033d8d48dc9b90c9aa1e6d074c"
 app_client_secret = "1aa0b1b3d6a94f00a1125c24394a886e"
@@ -53,7 +54,7 @@ def artist_5_related(artist_name: str) -> dict | None:
 
 
 def artist_five_tracks(artist_name: str, country: str = 'CA') -> dict | None:
-    """Return 5 random top tracks from the given artist. 
+    """Return 5 random top tracks from the given artist.
     """
     ids = artist_id(artist_name)
     if ids is None:
