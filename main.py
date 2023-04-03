@@ -1,5 +1,16 @@
 """CSC111: Spotipython Project - Main File
+
+This Python file contains the recommend_song() function
+which is responsible for recommending a song.
+
+This file also contains the main block, consisting of
+the code necessary to run our program.
+
+Copyright and Usage Information
+===============================
+This file is Copyright (c) 2023 Amy Li, Brittany Lansang, and Gregory Gismondi.
 """
+
 import artist_tree
 import creator
 

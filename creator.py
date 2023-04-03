@@ -1,5 +1,13 @@
 """CSC111: Spotipython Project - Creator File
-Creates SongInfo, User, and App objects to be used by other functions and classes"""
+
+This Python module contains the create_user() and create_app()
+functions.
+
+Copyright and Usage Information
+===============================
+This file is Copyright (c) 2023 Amy Li, Brittany Lansang, and Gregory Gismondi.
+
+"""
 
 from __future__ import annotations
 # Comment out this line when you aren't using check_contracts
