@@ -21,7 +21,10 @@ from user import User
 
 class SongAttributes:
     """
-    Information about a song's attributes
+    Information about a song's attributes.
+    
+    Credit for the descriptions of these instance attributes is attributed to the Spotify Developer documentation:
+    https://developer.spotify.com/documentation/web-api/reference/get-audio-features
 
     Instance Attributes:
       - danceability: how suitable a track is for dancing based on a combination of musical elements.
@@ -56,11 +59,8 @@ class SongAttributes:
 class SongInfo:
     """
     Information about a song.
-    Contains the attributes of a song. In particular, it contains the song name, the artist name, and
-    the 5 song attributes below.
-
-    Credit for the descriptions of the last 5 instance attributes is attributed to the Spotify Developer documentation:
-    https://developer.spotify.com/documentation/web-api/reference/get-audio-features
+    Contains the attributes of a song. In particular, it contains the song name, the artist name, 
+    difference_score, track_attributes, a spotipy object, and a corresponding user.
 
     Instance Attributes:
       - song_name: The name of this song
