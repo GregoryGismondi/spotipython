@@ -2,17 +2,14 @@
 Creates SongInfo, User, and App objects to be used by other functions and classes"""
 
 from __future__ import annotations
-from typing import Optional
 # Comment out this line when you aren't using check_contracts
-from python_ta.contracts import check_contracts
+# from python_ta.contracts import check_contracts
 
-from user import User
-import artist_tree
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from user import User
 
 
-@check_contracts
 def create_user() -> User:
     """Prompts the user to answer some questions and creates a User object
     for the given user input
@@ -51,63 +48,6 @@ def create_user() -> User:
         return User(song_name, artist_name, fav_attribute.lower(), div_level)
 
 
-# def difference_score(curr_user: User, og_song: artist_tree.SongInfo, new_song: artist_tree.SongInfo) -> float:
-#     """ Calculates a difference score between the original song and the new song based on the difference in values
-#     between each attribute of the song. This 'score' is a non-negative float. A score of 0.0 means the new song
-#     is very similar to the original song, while a higher score indicates the new_song is more different from the
-#     original. If the user chose a particular characteristic they liked about the original song, it will make up 50%
-#     of the weighting when calculating the difference score, while the 5 other attributes would make up the
-#     rest, at 10% each. If no characteristic was chosen, then all characteristics are weighed equally.
-#
-#     This score is calculated by finding the absolute value of the difference for each attribute, applying the
-#     appropriate weighting, summing up the values, and dividing the entire thing by the number of attributes
-#     there are.
-#
-#     Updates the new_song info to contain its score.
-#     """
-#     diff_danceability = abs(og_song.danceability - new_song.danceability)
-#     diff_valence = abs(og_song.valence - new_song.valence)
-#     diff_tempo = abs(og_song.tempo - new_song.valence)
-#     diff_instrumentalness = abs(og_song.instrumentalness - new_song.instrumentalness)
-#     diff_energy = abs(og_song.energy - new_song.energy)
-#     diff_acousticness = abs(og_song.acousticness - new_song.acousticness)
-#
-#     if curr_user.fav_attribute is None:
-#         total = diff_danceability + diff_valence + diff_tempo + diff_instrumentalness + diff_energy + diff_acousticness
-#         avg = total/6
-#         new_song.difference_score = avg
-#         return avg
-#     elif curr_user.fav_attribute == 'danceability':
-#         avg = diff_danceability*0.5 + diff_valence*0.1 + diff_tempo*0.1 + diff_instrumentalness*0.1 + \
-#               diff_energy*0.1 + diff_acousticness*0.1
-#         new_song.difference_score = avg
-#         return avg
-#     elif curr_user.fav_attribute == 'valence':
-#         avg = diff_danceability * 0.1 + diff_valence * 0.5 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
-#               diff_energy * 0.1 + diff_acousticness * 0.1
-#         return avg
-#     elif curr_user.fav_attribute == 'tempo':
-#         avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.5 + diff_instrumentalness * 0.1 + \
-#               diff_energy * 0.1 + diff_acousticness * 0.1
-#         new_song.difference_score = avg
-#         return avg
-#     elif curr_user.fav_attribute == 'instrumentalness':
-#         avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.5 + \
-#               diff_energy * 0.1 + diff_acousticness * 0.1
-#         new_song.difference_score = avg
-#         return avg
-#     elif curr_user.fav_attribute == 'energy':
-#         avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
-#               diff_energy * 0.5 + diff_acousticness * 0.1
-#         new_song.difference_score = avg
-#         return avg
-#     elif curr_user.fav_attribute == 'acousticness':
-#         avg = diff_danceability * 0.1 + diff_valence * 0.1 + diff_tempo * 0.1 + diff_instrumentalness * 0.1 + \
-#               diff_energy * 0.1 + diff_acousticness * 0.5
-#         new_song.difference_score = avg
-#         return avg
-
-
 def create_app() -> spotipy.Spotify:
     """Creates a Spotify API class using Spotipy funcitons
     """
@@ -117,3 +57,21 @@ def create_app() -> spotipy.Spotify:
     client_credentials_manager = SpotifyClientCredentials(client_id=app_client_id, client_secret=app_client_secret)
     spotify = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
     return spotify
+
+
+if __name__ == '__main__':
+    import doctest
+
+    doctest.testmod(verbose=True)
+
+    # When you are ready to check your work with python_ta, uncomment the following lines.
+    # (In PyCharm, select the lines below and press Ctrl/Cmd + / to toggle comments.)
+    # You can use "Run file in Python Console" to run PythonTA,
+    # and then also test your methods manually in the console.
+    import python_ta
+
+    python_ta.check_all(config={
+        'max-line-length': 120,
+        'extra-imports': ['random', 'spotipy', 'user', 'spotipy.oauth2'],
+        'allowed-io': ['input']
+    })
