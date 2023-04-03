@@ -1,6 +1,6 @@
 """CSC111: Spotipython Project - User File
 
-This Python module contains the User class which stores the 
+This Python module contains the User class which stores the
 user's preferences.
 
 Copyright and Usage Information
@@ -26,6 +26,11 @@ class User:
         of the artist tree, with a larger level of 'diversity' representing a deeper depth into the tree of artists.
         If the user chooses not to input a number, 'diversity' defaults to 0.
         - fav_attribute: The user's favorite attribute about their chosen song, if any.
+
+    Representation Invariant:
+    - diversity_level >= 0
+    - fav_attribute is None or fav_attribute in {'danceability', 'valence', 'tempo', 'instrumental', 'energy',
+        'acoustic'}
     """
     song_name: str
     artist_name: str

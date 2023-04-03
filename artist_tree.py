@@ -1,7 +1,7 @@
 """CSC111: Spotipython Project - ArtistTree File
 
 This Python module contains the SongInfo, ArtistNode, and ArtistTree class.
-It also defines other methods within these classes, and functions outside the classes. 
+It also defines other methods within these classes, and functions outside the classes.
 
 Copyright and Usage Information
 ===============================
@@ -22,7 +22,7 @@ from user import User
 class SongAttributes:
     """
     Information about a song's attributes.
-    
+
     Credit for the descriptions of these instance attributes is attributed to the Spotify Developer documentation:
     https://developer.spotify.com/documentation/web-api/reference/get-audio-features
 
@@ -59,7 +59,7 @@ class SongAttributes:
 class SongInfo:
     """
     Information about a song.
-    Contains the attributes of a song. In particular, it contains the song name, the artist name, 
+    Contains the attributes of a song. In particular, it contains the song name, the artist name,
     difference_score, track_attributes, a spotipy object, and a corresponding user.
 
     Instance Attributes:
@@ -354,7 +354,11 @@ def get_artist_id(artist_name: str, sp: spotipy.Spotify) -> str:
     Preconditions:
     - The artist_name must be written the way it is on their spotify profile.
     """
-    results = sp.search(q=artist_name, type='artist', limit=1)
+    results = sp.search(q=artist_name, type='artist', limit=10)
+    for artist in results["artists"]["items"]:
+        if artist["name"] == artist_name:
+            return artist["id"]
+
     ids = results["artists"]["items"][0]["id"]
     return ids
 
