@@ -1,5 +1,14 @@
 """CSC111: Spotipython Project - User File
-Stores user's inputs in the User Calss"""
+
+This Python module contains the User class which stores the 
+user's preferences.
+
+Copyright and Usage Information
+===============================
+This file is Copyright (c) 2023 Amy Li, Brittany Lansang, and Gregory Gismondi.
+
+"""
+
 from __future__ import annotations
 from typing import Optional
 
