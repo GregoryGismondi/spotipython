@@ -1,5 +1,13 @@
 """CSC111: Spotipython Project - ArtistTree File
-Defining code and methods for SongInfo, ArtistInfo, ArtistTree, as well as other helper funcitons"""
+
+This Python module contains the SongInfo, ArtistNode, and ArtistTree class.
+It also defines other methods within these classes, and functions outside the classes. 
+
+Copyright and Usage Information
+===============================
+This file is Copyright (c) 2023 Amy Li, Brittany Lansang, and Gregory Gismondi.
+"""
+
 from __future__ import annotations
 from typing import Optional
 
