@@ -14,3 +14,5 @@ To run an example of the program, call the example_recommend() function from the
 a diversity level of 1, and a focus on the 'danceability' of the song.
 
 As this was completed for a group project, there will most likely not be any future updates for bug fixes or extra features.
+
+Note: This project currently will not work as the secret key published is not the one currently in use (for security reasons).
